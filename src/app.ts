@@ -52,9 +52,13 @@ app.get("*", async (req: Request, res: Response) => {
 });
 
 
-app.listen(5000, () => {
-  return console.log(`Express is listening at http://localhost:${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`Express is listening at http://localhost:${port}`);
+// });
+
+app.listen(port, () => {
+	console.log(`Express is listening at http://localhost:${port}`);
+  });
 
 //const handler = serverless(app)
 

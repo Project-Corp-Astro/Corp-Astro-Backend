@@ -144,9 +144,57 @@ attendanceRoutes.post("/clock-in", async (req: any, res: any) => {
 // });
 
 // POST: Employee Clock-Out API
-attendanceRoutes.post("/clock-out", async (req: any, res: any) => {
+// attendanceRoutes.post("/clock-out", async (req: any, res: any) => {
+//   try {
+//     const empId = req.user?.empId; // Get empId from token
+
+//     if (!empId) {
+//       return res.status(401).json({ message: "Unauthorized: Employee ID missing" });
+//     }
+
+//     const { clockOutTime, clockOutLocation, clockOutImage } = req.body;
+
+//     if (!clockOutTime || !clockOutLocation || !clockOutImage) {
+//       return res.status(400).json({ message: "All fields are required" });
+//     }
+
+//     const [latitude, longitude] = clockOutLocation.split(",").map(parseFloat);
+//     if (isNaN(latitude) || isNaN(longitude)) {
+//       return res.status(400).json({ message: "Invalid location coordinates" });
+//     }
+
+//     const locationName = await getLocationName(latitude, longitude);
+
+//     const employee = await Employee.findByPk(empId);
+//     if (!employee) {
+//       return res.status(404).json({ message: "Employee not found" });
+//     }
+
+//     // Find the latest clock-in record without clock-out
+//     const attendance = await Attendance.findOne({
+//       where: { empId, clockOutTime: null },
+//       order: [["clockInTime", "DESC"]],
+//     });
+
+//     if (!attendance) {
+//       return res.status(404).json({ message: "No active clock-in record found" });
+//     }
+
+//     // Update Attendance record with clock-out details
+//     attendance.clockOutTime = clockOutTime;
+//     attendance.clockOutLocation = { latitude, longitude, locationName };
+//     attendance.clockOutImage = clockOutImage;
+//     await attendance.save();
+
+//     return res.status(200).json({ message: "Clock-out successful", attendance });
+//   } catch (error) {
+//     console.error("Clock-out error:", error);
+//     return res.status(500).json({ message: "Server error", error });
+//   }
+// });
+attendanceRoutes.patch("/clock-out", async (req: any, res: any) => {
   try {
-    const empId = req.user?.empId; // Get empId from token
+    const empId = req.user?.empId;
 
     if (!empId) {
       return res.status(401).json({ message: "Unauthorized: Employee ID missing" });
@@ -170,8 +218,7 @@ attendanceRoutes.post("/clock-out", async (req: any, res: any) => {
       return res.status(404).json({ message: "Employee not found" });
     }
 
-    // Find the latest clock-in record without clock-out
-    const attendance = await Attendance.findOne({
+    let attendance = await Attendance.findOne({
       where: { empId, clockOutTime: null },
       order: [["clockInTime", "DESC"]],
     });
@@ -180,7 +227,6 @@ attendanceRoutes.post("/clock-out", async (req: any, res: any) => {
       return res.status(404).json({ message: "No active clock-in record found" });
     }
 
-    // Update Attendance record with clock-out details
     attendance.clockOutTime = clockOutTime;
     attendance.clockOutLocation = { latitude, longitude, locationName };
     attendance.clockOutImage = clockOutImage;
@@ -189,6 +235,116 @@ attendanceRoutes.post("/clock-out", async (req: any, res: any) => {
     return res.status(200).json({ message: "Clock-out successful", attendance });
   } catch (error) {
     console.error("Clock-out error:", error);
+    return res.status(500).json({ message: "Server error", error });
+  }
+});
+
+
+// POST: Employee Break-In API
+attendanceRoutes.patch("/break-in", async (req: any, res: any) => {
+  try {
+    const empId = req.user?.empId;
+
+    if (!empId) {
+      return res.status(401).json({ message: "Unauthorized: Employee ID missing" });
+    }
+
+    const { breakInTime, breakInLocation, breakInImage } = req.body;
+
+    if (!breakInTime || !breakInLocation || !breakInImage) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const [latitude, longitude] = breakInLocation.split(",").map(parseFloat);
+    if (isNaN(latitude) || isNaN(longitude)) {
+      return res.status(400).json({ message: "Invalid location coordinates" });
+    }
+
+    const locationName = await getLocationName(latitude, longitude);
+
+    const employee = await Employee.findByPk(empId);
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    // Check if employee has an active clock-in and has not clocked out
+    const attendance = await Attendance.findOne({
+      where: { empId, clockOutTime: null },
+      order: [["clockInTime", "DESC"]],
+    });
+
+    if (!attendance) {
+      return res.status(400).json({ message: "Employee must be clocked in and not clocked out to take a break." });
+    }
+
+    await attendance.update({
+      breakInTime,
+      breakInLocation: { latitude, longitude, locationName },
+      breakInImage,
+    });
+
+    return res.status(200).json({ message: "Break-in recorded successfully." });
+  } catch (error) {
+    console.error("Break-in error:", error);
+    return res.status(500).json({ message: "Server error", error });
+  }
+});
+
+
+attendanceRoutes.patch("/break-out", async (req: any, res: any) => {
+  try {
+    const empId = req.user?.empId; // Get employee ID from token
+
+    if (!empId) {
+      return res.status(401).json({ message: "Unauthorized: Employee ID missing" });
+    }
+
+    const { breakOutTime, breakOutLocation, breakOutImage } = req.body;
+
+    if (!breakOutTime || !breakOutLocation || !breakOutImage) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const [latitude, longitude] = breakOutLocation.split(",").map(parseFloat);
+    if (isNaN(latitude) || isNaN(longitude)) {
+      return res.status(400).json({ message: "Invalid location coordinates" });
+    }
+
+    const locationName = await getLocationName(latitude, longitude);
+
+    const employee = await Employee.findByPk(empId);
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    // Check if employee has clocked in, not clocked out, and has taken a break-in
+    const attendance = await Attendance.findOne({
+      where: { empId, clockOutTime: null },
+      order: [["clockInTime", "DESC"]],
+    });
+
+    if (!attendance) {
+      return res.status(400).json({ message: "Employee has not clocked in or has already clocked out." });
+    }
+
+    if (!attendance.breakInTime) {
+      return res.status(400).json({ message: "Employee has not taken a break-in yet." });
+    }
+
+    if (attendance.breakOutTime) {
+      return res.status(400).json({ message: "Break-out has already been recorded." });
+    }
+
+    // Update Break-Out details
+    await attendance.update({
+      breakOutTime,
+      breakOutLocation: { latitude, longitude, locationName },
+      breakOutImage,
+    });
+
+    return res.status(200).json({ message: "Break-out recorded successfully." });
+  } catch (error) {
+    console.error("Break-out error:", error);
     return res.status(500).json({ message: "Server error", error });
   }
 });
