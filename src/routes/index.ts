@@ -14,7 +14,6 @@ const routes = Router();
 routes.use('/createEmployee', employeeRoutes)
 routes.use('/login', employeeRoutes)
 routes.use('/attendance', authenticateauthToken, attendanceRoutes)
-routes.use('/attendance-ClockOut', authenticateauthToken, attendanceRoutes)
 
 //routes.use('/getemployee', getAllEmployees)
 

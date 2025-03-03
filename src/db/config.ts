@@ -20,6 +20,13 @@ function getConnection() {
     host: dbHost,
     port: dbPort,
     dialect: 'postgres',
+    // pool: {
+    //   max: 100,  // Increase max connections in the pool
+    //   min: 0,
+    //   acquire: 30000, // Maximum time (ms) to acquire a connection before throwing error
+    //   idle: 10000, // Time (ms) before an idle connection is released
+    // },
+    // logging: false, // Disable logging if not needed
   });
 }
 
