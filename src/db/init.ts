@@ -1,11 +1,13 @@
-import Attendance from "./models/attendance.model";
-import Employee from "./models/employee.model";
+import Chart from "./models/chart.model";
+import User from "./models/user.model";
+
 
 const isDev = true
 async function init() {
 
-  await Employee.sync({ alter: isDev });
-  await Attendance.sync({ alter: isDev });
+
+  await Chart.sync({ alter: isDev });
+  await User.sync({ alter: isDev });
 
  
   }

@@ -1,7 +1,9 @@
 import { Router } from 'express';
-import employeeRoutes from './employeeRoutes';
-import attendanceRoutes from './attendanceRoutes';
 import { authenticateauthToken } from '../middleware/authenticateauthToken';
+import chartrouter from './chartRoutes';
+import authrouter from './authRoutes';
+import authMiddleware from '../middleware/authMiddleware';
+
 
 
 
@@ -10,12 +12,8 @@ import { authenticateauthToken } from '../middleware/authenticateauthToken';
 
 
 const routes = Router();
-//routes.use('/user',userRouter)
-routes.use('/createEmployee', employeeRoutes)
-routes.use('/login', employeeRoutes)
-routes.use('/attendance', authenticateauthToken, attendanceRoutes)
-
-//routes.use('/getemployee', getAllEmployees)
+routes.use('/chart',authMiddleware, chartrouter )
+routes.use('/auth', authrouter )
 
 
 export default routes;
