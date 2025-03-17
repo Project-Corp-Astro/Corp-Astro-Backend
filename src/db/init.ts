@@ -2,7 +2,7 @@ import Chart from "./models/chart.model";
 import User from "./models/user.model";
 
 
-const isDev = true
+const isDev = false;
 async function init() {
 
 

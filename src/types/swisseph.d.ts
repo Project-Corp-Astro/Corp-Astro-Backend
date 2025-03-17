@@ -29,5 +29,13 @@ declare module "swisseph" {
   export function swe_set_ephe_path(arg0: string) {
     throw new Error("Function not implemented.");
   }
+
+  export function swe_calc(julianDay: number, planet: number, SEFLG_SPEED: any, arg3: (position: { longitude: number; latitude: number; distance: number; longitudeSpeed: number; latitudeSpeed: number; distanceSpeed: number; rflag: number; } | { rectAscension: number; declination: number; distance: number; rectAscensionSpeed: number; declinationSpeed: number; distanceSpeed: number; rflag: number; }) => void) {
+    throw new Error("Function not implemented.");
+  }
+
+  export function SEFLG_SPEED(julianDay: number, planet: number, SEFLG_SPEED: any, arg3: (position: { longitude: number; latitude: number; distance: number; longitudeSpeed: number; latitudeSpeed: number; distanceSpeed: number; rflag: number; } | { rectAscension: number; declination: number; distance: number; rectAscensionSpeed: number; declinationSpeed: number; distanceSpeed: number; rflag: number; }) => void) {
+    throw new Error("Function not implemented.");
+  }
   }
   
